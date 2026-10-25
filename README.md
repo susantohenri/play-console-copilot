@@ -2,6 +2,15 @@
 
 Ekstensi Chrome berbasis Manifest V3 & Side Panel untuk menjelajahi Google Play Console, menerjemahkan analitik teknis menjadi cerita yang mudah dipahami, serta menyusun rencana aksi berprioritas (P1, P2, P3).
 
+🌐 **Landing Page Resmi & Panduan:** [susantohenri.github.io/play-console-copilot](https://susantohenri.github.io/play-console-copilot/)  
+📦 **Download Langsung:** [play-console-copilot-v1.0.0.zip](https://github.com/susantohenri/play-console-copilot/raw/main/docs/play-console-copilot-v1.0.0.zip)
+
+---
+
+<p align="center">
+  <img src="screenshot.png" alt="Play Console Copilot Screenshot" width="480" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</p>
+
 ---
 
 ## 📦 Cara Memasang di Chrome (Cukup 1 Kali di Awal)

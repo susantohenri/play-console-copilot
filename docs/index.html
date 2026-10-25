@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Play Console Copilot — Dokter Aplikasi & Mentor Android</title>
+  <meta name="description" content="Ekstensi Chrome AI untuk menjelajahi analitik Google Play Console, mengurai sumber trafik, mendeteksi penyebab uninstall, dan menyusun rencana perbaikan berprioritas.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+</head>
+<body>
+  <!-- Navigation Header -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <div class="nav-brand">
+        <span class="logo-icon">🚀</span>
+        <span class="brand-name">Play Console Copilot</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#fitur">Fitur</a>
+        <a href="#cara-install">Cara Install</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/susantohenri/play-console-copilot" target="_blank" class="nav-link-gh">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="play-console-copilot-v1.0.0.zip" download class="btn btn-nav">⬇️ Download ZIP</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container hero-container">
+      <div class="hero-text">
+        <div class="badge-pill">✨ 100% Gratis & Open Source • Manifest V3</div>
+        <h1 class="hero-title">
+          Pahami Analitik Google Play Store <span class="gradient-text">Tanpa Pusing Buka Grafik Satu per Satu.</span>
+        </h1>
+        <p class="hero-desc">
+          Ekstensi Chrome berbasis AI yang otomatis berkeliling menjelajahi jeroan Play Console aplikasimu. Mengurai sumber trafik unduhan, mendiagnosa penyebab kebocoran uninstall, dan merangkum rencana aksi berprioritas (P1, P2, P3).
+        </p>
+
+        <div class="hero-actions">
+          <a href="play-console-copilot-v1.0.0.zip" download class="btn btn-primary btn-lg">
+            <span class="btn-icon">⬇️</span> Download Ekstensi (.zip)
+          </a>
+          <a href="#cara-install" class="btn btn-secondary btn-lg">
+            <span class="btn-icon">📖</span> Cara Pasang (1 Menit)
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">4 Pos</span>
+            <span class="stat-label">Audit Otomatis</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">3 Detik</span>
+            <span class="stat-label">Cepat Di-Scan</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">$0</span>
+            <span class="stat-label">Bebas Web Store Fee</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshot Showcase Mockup -->
+      <div class="hero-preview">
+        <div class="browser-window">
+          <div class="window-header">
+            <div class="window-buttons">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="window-title">Play Console Copilot — Side Panel</div>
+          </div>
+          <div class="window-body">
+            <img src="screenshot.png" alt="Screenshot Tampilan Play Console Copilot di Google Chrome" class="preview-img" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem vs Solution Section -->
+  <section class="problems-section">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-badge">Masalah Developer</span>
+        <h2>Kenapa Play Console Bikin Pusing?</h2>
+        <p>Kamu sudah capek-capek rilis aplikasi, tapi membaca statistik bawaannya seperti masuk labirin.</p>
+      </div>
+
+      <div class="problem-cards-grid">
+        <div class="card problem-card">
+          <div class="card-icon red">❌</div>
+          <h3>Terjebak di 10 Menu Terpisah</h3>
+          <p>Harus klik Dashboard, Store Performance, Android Vitals, Statistics, dan Ulasan manual hanya untuk mengira-ngira apa yang sedang terjadi.</p>
+        </div>
+
+        <div class="card problem-card">
+          <div class="card-icon red">❌</div>
+          <h3>Capek Tanya AI Satu per Satu</h3>
+          <p>Screenshot grafik satu demi satu lalu nanya ke ChatGPT atau Gemini extension sangat memakan waktu dan melelahkan.</p>
+        </div>
+
+        <div class="card problem-card">
+          <div class="card-icon green">✅</div>
+          <h3>Solusi: Play Console Copilot</h3>
+          <p>Cukup 1 klik <strong>"Mulai Jelajahi"</strong>. Ekstensi langsung berkeliling, menghubungkan data antar menu, dan memberikan diagnosa konkret.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="fitur" class="features-section">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-badge">Fitur Unggulan</span>
+        <h2>Semua yang Kamu Butuhkan untuk Membaca Aplikasimu</h2>
+        <p>Bukan sekadar penampil angka, melainkan "Dokter Aplikasi" yang memberi tahu akar masalah dan solusinya.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="card feature-card">
+          <div class="feature-icon">🧭</div>
+          <h3>Penjelajah 4 Pos Kunci</h3>
+          <p>Ekstensi otomatis mampir ke <strong>Lapak Toko</strong>, <strong>Kondisi Mesin (Crash & ANR)</strong>, <strong>Retensi Pengguna</strong>, dan <strong>Ulasan</strong> secara sekuensial.</p>
+        </div>
+
+        <div class="card feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Detektor Sumber Trafik Riil</h3>
+          <p>Ketahui persis berapa orang yang mendownload dari pencarian Play Store (lengkap dengan kata kunci apa yang mereka ketik), rekomendasi explore, atau referal luar.</p>
+        </div>
+
+        <div class="card feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Scan-Friendly Bullet Cards</h3>
+          <p>Tidak ada lagi paragraf esai yang panjang dan melelahkan. Semua disajikan dalam format poin-poin ringkas dengan angka tebal yang bisa dipahami dalam 3 detik.</p>
+        </div>
+
+        <div class="card feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>To-Do List Berprioritas (P1, P2, P3)</h3>
+          <p>Langsung tahu apa yang harus kamu perbaiki hari ini (P1: Kritis/Cegah Uninstall, P2: Pertumbuhan/Optimasi ASO, P3: Penyempurnaan santai).</p>
+        </div>
+
+        <div class="card feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>Bawa AI Sendiri (FreeLLMAPI & Gemini)</h3>
+          <p>Bebas gunakan provider pilihanmu: FreeLLMAPI (routing model <code>auto</code>), OpenAI-compatible endpoint, atau Google Gemini resmi gratis.</p>
+        </div>
+
+        <div class="card feature-card">
+          <div class="feature-icon">🌙</div>
+          <h3>Dark Mode Nyaman</h3>
+          <p>Dukungan tema gelap bawaan yang elegan dan nyaman di mata saat kamu mengecek performa aplikasi di malam hari.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Steps Section -->
+  <section id="cara-install" class="install-section">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-badge">Panduan Praktis</span>
+        <h2>Cara Pasang di Google Chrome (Cuma 1 Menit)</h2>
+        <p>Tanpa perlu lewat Chrome Web Store, bisa langsung dipasang sekarang juga.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="card step-card">
+          <div class="step-badge">1</div>
+          <h3>Download & Ekstrak</h3>
+          <p>Klik tombol download di bawah untuk mendapatkan file <code>play-console-copilot-v1.0.0.zip</code>, lalu ekstrak ke salah satu folder di komputermu.</p>
+          <a href="play-console-copilot-v1.0.0.zip" download class="btn btn-outline btn-sm">⬇️ Download ZIP (26 KB)</a>
+        </div>
+
+        <div class="card step-card">
+          <div class="step-badge">2</div>
+          <h3>Buka Menu Ekstensi</h3>
+          <p>Buka browser Chrome, ketik di URL bar: <code>chrome://extensions/</code> lalu tekan Enter. Di pojok kanan atas, nyalakan toggle <strong>Developer mode</strong>.</p>
+          <div class="code-snippet">chrome://extensions/</div>
+        </div>
+
+        <div class="card step-card">
+          <div class="step-badge">3</div>
+          <h3>Klik "Load Unpacked"</h3>
+          <p>Klik tombol <strong>Load unpacked</strong> di pojok kiri atas browser, lalu pilih folder hasil ekstrak tadi. Selesai! Ikon ekstensi akan langsung muncul.</p>
+          <span class="badge-success">Siap Digunakan 🎉</span>
+        </div>
+      </div>
+
+      <div class="install-note text-center">
+        💡 <em>Bisa juga dipasang di browser berbasis Chromium lainnya seperti <strong>Microsoft Edge</strong>, <strong>Brave Browser</strong>, atau <strong>Arc</strong> dengan langkah yang sama.</em>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="faq-section">
+    <div class="container">
+      <div class="section-header text-center">
+        <span class="section-badge">FAQ</span>
+        <h2>Pertanyaan yang Sering Ditanyakan</h2>
+      </div>
+
+      <div class="faq-accordion">
+        <div class="card faq-item">
+          <h4>Apakah ekstensi ini gratis?</h4>
+          <p>Ya, 100% gratis dan open-source di bawah lisensi MIT. Kamu bebas menggunakan, memodifikasi, atau membagikannya ke teman-temanmu.</p>
+        </div>
+
+        <div class="card faq-item">
+          <h4>Apakah data akun Google Play Console saya aman?</h4>
+          <p>Sangat aman. Ekstensi ini berjalan langsung di browser komputermu (client-side) dan tidak memiliki server perantara (middleman). Data halaman Play Console hanya dikirim langsung ke penyedia AI yang kamu atur sendiri (misal proxy FreeLLMAPI lokal atau Google Gemini).</p>
+        </div>
+
+        <div class="card faq-item">
+          <h4>Bagaimana cara menggunakan model AI gratisan?</h4>
+          <p>Kamu bisa klik tombol pengaturan <strong>⚙️</strong> di pojok kanan atas Side Panel, lalu pilih menghubungkan ke FreeLLMAPI lokalmu (model <code>auto</code>) atau memasukkan Gemini API Key gratis dari Google AI Studio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="cta-banner">
+    <div class="container text-center">
+      <h2>Mulai Pahami Kondisi Aplikasimu Sekarang</h2>
+      <p>Download ekstensinya dan biarkan Dokter Aplikasi yang bekerja menjelajahi datamu.</p>
+      <div class="cta-actions">
+        <a href="play-console-copilot-v1.0.0.zip" download class="btn btn-primary btn-lg">
+          ⬇️ Download Play Console Copilot (.zip)
+        </a>
+        <a href="https://github.com/susantohenri/play-console-copilot" target="_blank" class="btn btn-secondary btn-lg">
+          ⭐ Star di GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>© 2026 <strong>Play Console Copilot</strong>. Dibuat dengan ❤️ oleh <a href="https://github.com/susantohenri" target="_blank">Henri Susanto</a>.</p>
+      <p class="footer-sub">Open Source • Bukan produk resmi dari Google LLC.</p>
+    </div>
+  </footer>
+</body>
+</html>
