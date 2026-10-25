@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Play Console Copilot</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">🚀</div>
+        <div>
+          <h1 class="brand-title">Play Console Copilot</h1>
+          <p class="brand-subtitle">Mentor & Detektif Aplikasi Anda</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btnThemeToggle" class="icon-button" title="Ganti Mode Gelap/Terang">🌙</button>
+        <button id="btnSettingsToggle" class="icon-button" title="Pengaturan API">⚙️</button>
+      </div>
+    </header>
+
+    <!-- Collapsible App Status & Tour Bar (Compact to give full height to Doctor) -->
+    <section id="topControlSection" class="top-control-section">
+      <div id="detectionBanner" class="detection-banner banner-idle">
+        <div class="banner-status-icon" id="bannerIcon">🔍</div>
+        <div class="banner-text">
+          <div class="banner-title" id="detectedAppTitle">Memeriksa Tab Play Console...</div>
+          <div class="banner-desc" id="detectedAppDesc">Buka Play Console aplikasimu untuk memulai penjelajahan.</div>
+        </div>
+        <button id="btnToggleTopCard" class="btn-toggle-top" title="Sembunyikan/Tampilkan Kontrol">▲</button>
+      </div>
+
+      <div id="tourControlCard" class="tour-control-card">
+        <div class="tour-actions">
+          <button id="btnStartTour" class="btn btn-primary btn-block">
+            <span class="btn-icon">🧭</span> Mulai Jelajahi Play Console
+          </button>
+          <button id="btnScanCurrent" class="btn btn-outline btn-block">
+            <span class="btn-icon">📸</span> Analisis Halaman Ini Saja
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tour Progress Stepper (Visible during exploration) -->
+    <section id="tourProgressCard" class="tour-progress-card hidden">
+      <h3 class="progress-title">Sedang Menjelajahi Play Console...</h3>
+      <p class="progress-subtitle" id="progressSubtitle">Menuju pos pertama...</p>
+
+      <div class="stepper">
+        <div class="step-item" id="step1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Lapak & Trafik</div>
+        </div>
+        <div class="step-line" id="line1"></div>
+        <div class="step-item" id="step2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Mesin (Vitals)</div>
+        </div>
+        <div class="step-line" id="line2"></div>
+        <div class="step-item" id="step3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Retensi</div>
+        </div>
+        <div class="step-line" id="line3"></div>
+        <div class="step-item" id="step4">
+          <div class="step-circle">4</div>
+          <div class="step-label">Ulasan</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results & Chat Area -->
+    <main class="main-content">
+      <div id="chatStream" class="chat-stream">
+        <!-- Welcoming Message Bubble -->
+        <div class="message-bubble assistant">
+          <div class="bubble-header">
+            <span class="bubble-badge">Dokter Aplikasi</span>
+          </div>
+          <div class="bubble-content">
+            Halo! Selamat atas pencapaian aplikasimu! 🎉<br><br>
+            Membaca statistik Play Console satu per satu memang sering bikin bingung. Klik tombol <strong>"Mulai Jelajahi Play Console"</strong> di atas, biar saya keliling membaca semua pos metrik, merangkum apa yang sebenarnya terjadi, dan menyusun <strong>daftar prioritas perbaikan (P1, P2, P3)</strong> untukmu.
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Prompt Suggestion Pills -->
+      <div class="quick-prompts" id="quickPrompts">
+        <button class="prompt-pill" data-prompt="Jelaskan kenapa pengguna saya uninstall?">📉 Kenapa user uninstall?</button>
+        <button class="prompt-pill" data-prompt="Apa hal nomor 1 yang harus saya perbaiki sekarang?">🔴 Hal nomor 1 wajib diperbaiki?</button>
+        <button class="prompt-pill" data-prompt="Apakah angka konversi dan download saya tergolong bagus?">📊 Angka download saya bagus gak?</button>
+      </div>
+    </main>
+
+    <!-- Bottom Chat Input Bar -->
+    <footer class="app-footer">
+      <div class="chat-input-row">
+        <textarea id="chatInput" rows="1" placeholder="Tanyakan apapun seputar data aplikasimu..."></textarea>
+        <button id="btnSendChat" class="btn-send" title="Kirim Pesan">➤</button>
+      </div>
+    </footer>
+
+    <!-- Settings Modal Drawer -->
+    <div id="settingsModal" class="modal hidden">
+      <div class="modal-overlay" id="modalOverlay"></div>
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Pengaturan AI Provider & Model</h3>
+          <button id="btnCloseSettings" class="btn-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="inputBaseUrl">Base URL API:</label>
+            <input type="text" id="inputBaseUrl" placeholder="http://127.0.0.1:31415 atau https://..." />
+            <small class="help-text">Contoh: http://127.0.0.1:31415 (FreeLLMAPI lokal), OpenAI, atau Google.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="inputApiKey">API Key:</label>
+            <input type="password" id="inputApiKey" placeholder="Masukkan API Key..." />
+            <small class="help-text">Kunci API tersimpan aman di browser lokalmu.</small>
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="selectModel">Pilih Model:</label>
+              <button id="btnFetchModels" class="btn-text-action" type="button" title="Ambil daftar model dari Base URL">🔄 Fetch Models</button>
+            </div>
+            <select id="selectModel">
+              <option value="auto" selected>auto (Smart Routing)</option>
+              <option value="custom">✍️ Ketik Model Manual...</option>
+            </select>
+          </div>
+
+          <div class="form-group hidden" id="customModelGroup">
+            <label for="inputCustomModel">Nama Model Khusus:</label>
+            <input type="text" id="inputCustomModel" placeholder="Contoh: auto, gpt-4o, gemini-3.8-flash" />
+          </div>
+
+          <div id="settingsFeedback" class="feedback-msg hidden"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="btnSaveSettings" class="btn btn-primary">Simpan Pengaturan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

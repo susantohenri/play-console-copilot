@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Play Console Copilot: Mentor Analisis & Penjelajah",
+  "version": "1.0.0",
+  "description": "Menjelajahi Google Play Console, menyederhanakan data analitik, dan menyusun rekomendasi aksi berprioritas.",
+  "permissions": [
+    "sidePanel",
+    "tabs",
+    "scripting",
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://play.google.com/console/*",
+    "*://*/*",
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
+  "action": {
+    "default_title": "Buka Play Console Copilot"
+  },
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  }
+}
