@@ -115,15 +115,27 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="inputBaseUrl">Base URL API:</label>
-            <input type="text" id="inputBaseUrl" placeholder="http://127.0.0.1:31415 atau https://..." />
-            <small class="help-text">Contoh: http://127.0.0.1:31415 (FreeLLMAPI lokal), OpenAI, atau Google.</small>
+            <label for="selectProviderPreset">Pilihan AI Provider:</label>
+            <select id="selectProviderPreset">
+              <option value="gemini">🌟 Google Gemini (Resmi & Gratis untuk Teman)</option>
+              <option value="freellmapi">💻 FreeLLMAPI Lokal (127.0.0.1:31415)</option>
+              <option value="custom">⚙️ Custom / OpenAI Compatible</option>
+            </select>
           </div>
 
           <div class="form-group">
-            <label for="inputApiKey">API Key:</label>
+            <div class="label-row">
+              <label for="inputApiKey">API Key:</label>
+              <a href="https://aistudio.google.com/apikey" target="_blank" class="help-link" id="linkGetApiKey">🔑 Ambil Key Gratis</a>
+            </div>
             <input type="password" id="inputApiKey" placeholder="Masukkan API Key..." />
-            <small class="help-text">Kunci API tersimpan aman di browser lokalmu.</small>
+            <small class="help-text" id="apiKeyHelp">Kunci API tersimpan aman di browser lokalmu.</small>
+          </div>
+
+          <div class="form-group" id="baseUrlGroup">
+            <label for="inputBaseUrl">Base URL API:</label>
+            <input type="text" id="inputBaseUrl" placeholder="https://generativelanguage.googleapis.com/v1beta" />
+            <small class="help-text" id="baseUrlHelp">Google Gemini endpoint (resmi Google).</small>
           </div>
 
           <div class="form-group">
@@ -132,14 +144,17 @@
               <button id="btnFetchModels" class="btn-text-action" type="button" title="Ambil daftar model dari Base URL">🔄 Fetch Models</button>
             </div>
             <select id="selectModel">
-              <option value="auto" selected>auto (Smart Routing)</option>
+              <option value="gemini-3.8-flash">gemini-3.8-flash (Rekomendasi Cepat & Cerdas)</option>
+              <option value="gemini-flash-lite-latest">gemini-flash-lite-latest</option>
+              <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
+              <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
               <option value="custom">✍️ Ketik Model Manual...</option>
             </select>
           </div>
 
           <div class="form-group hidden" id="customModelGroup">
             <label for="inputCustomModel">Nama Model Khusus:</label>
-            <input type="text" id="inputCustomModel" placeholder="Contoh: auto, gpt-4o, gemini-3.8-flash" />
+            <input type="text" id="inputCustomModel" placeholder="Contoh: gemini-3.8-flash, auto, gpt-4o" />
           </div>
 
           <div id="settingsFeedback" class="feedback-msg hidden"></div>

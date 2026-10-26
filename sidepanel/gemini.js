@@ -1,10 +1,14 @@
 // Universal AI Provider Client (Supports FreeLLMAPI Anthropic/OpenAI protocol, & Google Gemini)
 
-const DEFAULT_BASE_URL = 'http://127.0.0.1:31415';
-const DEFAULT_API_KEY = '';
-const DEFAULT_MODEL = 'auto';
+export const DEFAULT_GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta';
+export const DEFAULT_LOCAL_URL = 'http://127.0.0.1:31415';
 
-const GEMINI_FALLBACK_MODELS = [
+// Default for public/fresh installs: Google Gemini (so friends don't hit 127.0.0.1 connection errors)
+export const DEFAULT_BASE_URL = DEFAULT_GEMINI_URL;
+export const DEFAULT_API_KEY = '';
+export const DEFAULT_MODEL = 'gemini-3.8-flash';
+
+export const GEMINI_FALLBACK_MODELS = [
   'gemini-3.8-flash',
   'gemini-flash-lite-latest',
   'gemini-3.5-flash-lite',
@@ -78,10 +82,13 @@ export class GeminiMentor {
    */
   static async fetchAvailableModels(baseUrl, apiKey) {
     const cleanUrl = normalizeApiBaseUrl(baseUrl || DEFAULT_BASE_URL);
-    const isGoogle = cleanUrl.toLowerCase().includes('generativelanguage.googleapis.com');
+    const isGoogle = cleanUrl.toLowerCase().includes('googleapis.com');
 
     try {
       if (isGoogle) {
+        if (!apiKey) {
+          return GEMINI_FALLBACK_MODELS;
+        }
         const url = `${cleanUrl}/models?key=${apiKey}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
@@ -91,6 +98,7 @@ export class GeminiMentor {
             .filter(m => !m.supportedGenerationMethods || m.supportedGenerationMethods.includes('generateContent'))
             .map(m => (m.name || m.id).replace('models/', ''));
         }
+        return GEMINI_FALLBACK_MODELS;
       } else {
         // FreeLLMAPI / OpenAI-compatible endpoint
         const url = `${cleanUrl}/models`;
@@ -123,8 +131,13 @@ export class GeminiMentor {
         return modelList;
       }
     } catch (err) {
-      console.warn('Failed to fetch models from', cleanUrl, err.message);
-      return isGoogle ? GEMINI_FALLBACK_MODELS : ['auto', 'fusion', 'claude-sonnet-4-5', 'claude-opus-4-5'];
+      if (cleanUrl.includes('127.0.0.1') || cleanUrl.includes('localhost')) {
+        throw new Error('Server FreeLLMAPI lokal (127.0.0.1:31415) tidak aktif di komputermu. Pastikan aplikasinya sudah kamu jalankan, atau gunakan Google Gemini.');
+      }
+      if (isGoogle) {
+        return GEMINI_FALLBACK_MODELS;
+      }
+      throw new Error(`Gagal menghubungi server (${err.message}). Periksa Base URL & API Key.`);
     }
   }
 
@@ -249,69 +262,79 @@ Sajikan hasil analisa dengan FORMAT RINGKAS & LIST OF BULLETS berikut (JANGAN BI
       content: c.parts.map(p => p.text).join('\n')
     }));
 
-    // Method 1: Try Anthropic /messages format (FreeLLMAPI native for Claude Code)
     try {
-      const anthropicUrl = `${cleanUrl}/messages`;
-      const res = await fetch(anthropicUrl, {
+      // Method 1: Try Anthropic /messages format (FreeLLMAPI native for Claude Code)
+      try {
+        const anthropicUrl = `${cleanUrl}/messages`;
+        const res = await fetch(anthropicUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': this.apiKey,
+            'Authorization': `Bearer ${this.apiKey}`,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: this.model || 'auto',
+            max_tokens: 4096,
+            system: this.getSystemInstruction(),
+            messages: messages
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.content) && data.content[0]?.text) {
+            return data.content[0].text;
+          }
+        }
+      } catch (e) {
+        console.warn('Anthropic protocol failed, trying OpenAI protocol...', e.message);
+      }
+
+      // Method 2: Try OpenAI /chat/completions format
+      const openaiUrl = `${cleanUrl}/chat/completions`;
+      const openAiMessages = [
+        { role: 'system', content: this.getSystemInstruction() },
+        ...messages
+      ];
+
+      const resOpenAI = await fetch(openaiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': this.apiKey,
           'Authorization': `Bearer ${this.apiKey}`,
-          'anthropic-version': '2023-06-01'
+          'x-api-key': this.apiKey
         },
         body: JSON.stringify({
           model: this.model || 'auto',
-          max_tokens: 4096,
-          system: this.getSystemInstruction(),
-          messages: messages
+          messages: openAiMessages,
+          temperature: 0.7
         })
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.content) && data.content[0]?.text) {
-          return data.content[0].text;
-        }
+      if (!resOpenAI.ok) {
+        const errorJson = await resOpenAI.json().catch(() => ({}));
+        const errorMsg = errorJson.error?.message || errorJson.message || `HTTP ${resOpenAI.status}: ${resOpenAI.statusText}`;
+        throw new Error(`AI Server Error: ${errorMsg}`);
       }
-    } catch (e) {
-      console.warn('Anthropic protocol failed, trying OpenAI protocol...', e.message);
+
+      const data = await resOpenAI.json();
+      const reply = data.choices?.[0]?.message?.content;
+      if (!reply) {
+        throw new Error('API tidak mengembalikan konten jawaban.');
+      }
+
+      return reply;
+    } catch (err) {
+      if (err.message.includes('Failed to fetch') || err.name === 'TypeError') {
+        if (cleanUrl.includes('127.0.0.1') || cleanUrl.includes('localhost')) {
+          throw new Error('Koneksi ke 127.0.0.1:31415 gagal. Server FreeLLMAPI tidak aktif di komputer ini. Jika kamu teman yang menginstall ekstensi ini, silakan buka Pengaturan (⚙️) lalu pilih Google Gemini API (gratis)!');
+        }
+        throw new Error(`Gagal menghubungi server AI (${cleanUrl}). Periksa koneksi internet.`);
+      }
+      throw err;
     }
-
-    // Method 2: Try OpenAI /chat/completions format
-    const openaiUrl = `${cleanUrl}/chat/completions`;
-    const openAiMessages = [
-      { role: 'system', content: this.getSystemInstruction() },
-      ...messages
-    ];
-
-    const resOpenAI = await fetch(openaiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
-        'x-api-key': this.apiKey
-      },
-      body: JSON.stringify({
-        model: this.model || 'auto',
-        messages: openAiMessages,
-        temperature: 0.7
-      })
-    });
-
-    if (!resOpenAI.ok) {
-      const errorJson = await resOpenAI.json().catch(() => ({}));
-      const errorMsg = errorJson.error?.message || errorJson.message || `HTTP ${resOpenAI.status}: ${resOpenAI.statusText}`;
-      throw new Error(`FreeLLMAPI / AI Error: ${errorMsg}`);
-    }
-
-    const data = await resOpenAI.json();
-    const reply = data.choices?.[0]?.message?.content;
-    if (!reply) {
-      throw new Error('API tidak mengembalikan konten jawaban.');
-    }
-
-    return reply;
   }
 
   /**
@@ -359,24 +382,31 @@ Sajikan hasil analisa dengan FORMAT RINGKAS & LIST OF BULLETS berikut (JANGAN BI
       }
     };
 
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
 
-    if (!res.ok) {
-      const errorJson = await res.json().catch(() => ({}));
-      const errorMsg = errorJson.error?.message || `HTTP ${res.status}: ${res.statusText}`;
-      throw new Error(errorMsg);
+      if (!res.ok) {
+        const errorJson = await res.json().catch(() => ({}));
+        const errorMsg = errorJson.error?.message || `HTTP ${res.status}: ${res.statusText}`;
+        throw new Error(errorMsg);
+      }
+
+      const data = await res.json();
+      const candidate = data.candidates?.[0];
+      if (!candidate || !candidate.content?.parts?.[0]?.text) {
+        throw new Error('API tidak mengembalikan teks jawaban.');
+      }
+
+      return candidate.content.parts[0].text;
+    } catch (err) {
+      if (err.message.includes('Failed to fetch') || err.name === 'TypeError') {
+        throw new Error('Gagal terhubung ke Google Gemini API. Periksa koneksi internetmu atau pastikan API Key sudah benar.');
+      }
+      throw err;
     }
-
-    const data = await res.json();
-    const candidate = data.candidates?.[0];
-    if (!candidate || !candidate.content?.parts?.[0]?.text) {
-      throw new Error('API tidak mengembalikan teks jawaban.');
-    }
-
-    return candidate.content.parts[0].text;
   }
 }

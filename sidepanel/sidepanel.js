@@ -1,4 +1,4 @@
-import { GeminiMentor } from './gemini.js';
+import { GeminiMentor, DEFAULT_GEMINI_URL, DEFAULT_LOCAL_URL, GEMINI_FALLBACK_MODELS } from './gemini.js';
 
 // Application State
 const mentor = new GeminiMentor((statusText) => {
@@ -36,6 +36,9 @@ const btnSettingsToggle = document.getElementById('btnSettingsToggle');
 const settingsModal = document.getElementById('settingsModal');
 const modalOverlay = document.getElementById('modalOverlay');
 const btnCloseSettings = document.getElementById('btnCloseSettings');
+const selectProviderPreset = document.getElementById('selectProviderPreset');
+const linkGetApiKey = document.getElementById('linkGetApiKey');
+const baseUrlHelp = document.getElementById('baseUrlHelp');
 const inputBaseUrl = document.getElementById('inputBaseUrl');
 const inputApiKey = document.getElementById('inputApiKey');
 const selectModel = document.getElementById('selectModel');
@@ -54,10 +57,67 @@ async function init() {
 
   inputBaseUrl.value = mentor.baseUrl;
   inputApiKey.value = mentor.apiKey;
+
+  // Determine active preset based on loaded baseUrl
+  const isLocal = mentor.baseUrl.includes('127.0.0.1') || mentor.baseUrl.includes('localhost');
+  const isGoogle = mentor.baseUrl.includes('googleapis.com');
+
+  if (selectProviderPreset) {
+    if (isLocal) {
+      selectProviderPreset.value = 'freellmapi';
+    } else if (isGoogle) {
+      selectProviderPreset.value = 'gemini';
+    } else {
+      selectProviderPreset.value = 'custom';
+    }
+    updatePresetUI(selectProviderPreset.value);
+  }
+
   updateModelDropdown(mentor.model);
 
   setupEventListeners();
   await checkActiveTab();
+}
+
+function updatePresetUI(preset) {
+  if (preset === 'gemini') {
+    if (baseUrlHelp) baseUrlHelp.textContent = 'Google Gemini endpoint resmi (gratis via Google AI Studio).';
+    if (linkGetApiKey) linkGetApiKey.classList.remove('hidden');
+  } else if (preset === 'freellmapi') {
+    if (baseUrlHelp) baseUrlHelp.textContent = 'FreeLLMAPI lokal (Hanya jalan jika aplikasi FreeLLMAPI aktif di komputermu).';
+    if (linkGetApiKey) linkGetApiKey.classList.add('hidden');
+  } else {
+    if (baseUrlHelp) baseUrlHelp.textContent = 'Custom Base URL OpenAI / Anthropic / Proxy lainnya.';
+    if (linkGetApiKey) linkGetApiKey.classList.add('hidden');
+  }
+}
+
+function applyProviderPreset(preset) {
+  updatePresetUI(preset);
+  if (preset === 'gemini') {
+    inputBaseUrl.value = DEFAULT_GEMINI_URL;
+    selectModel.innerHTML = '';
+    for (const m of GEMINI_FALLBACK_MODELS) {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m === 'gemini-3.8-flash' ? `${m} (Rekomendasi Cepat & Cerdas)` : m;
+      selectModel.appendChild(opt);
+    }
+    const customOpt = document.createElement('option');
+    customOpt.value = 'custom';
+    customOpt.textContent = '✍️ Ketik Model Manual...';
+    selectModel.appendChild(customOpt);
+    selectModel.value = 'gemini-3.8-flash';
+    customModelGroup.classList.add('hidden');
+  } else if (preset === 'freellmapi') {
+    inputBaseUrl.value = DEFAULT_LOCAL_URL;
+    selectModel.innerHTML = `
+      <option value="auto" selected>auto (Smart Routing)</option>
+      <option value="custom">✍️ Ketik Model Manual...</option>
+    `;
+    selectModel.value = 'auto';
+    customModelGroup.classList.add('hidden');
+  }
 }
 
 function updateModelDropdown(activeModel) {
@@ -164,6 +224,25 @@ function setupEventListeners() {
         inputCustomModel.focus();
       } else {
         customModelGroup.classList.add('hidden');
+      }
+    });
+  }
+
+  // Provider Preset changes
+  if (selectProviderPreset) {
+    selectProviderPreset.addEventListener('change', () => {
+      applyProviderPreset(selectProviderPreset.value);
+    });
+  }
+
+  // Smart detect Google Gemini API key on input/paste
+  if (inputApiKey) {
+    inputApiKey.addEventListener('input', () => {
+      const val = inputApiKey.value.trim();
+      if (val.startsWith('AIzaSy') && selectProviderPreset && selectProviderPreset.value !== 'gemini') {
+        selectProviderPreset.value = 'gemini';
+        applyProviderPreset('gemini');
+        showSettingsFeedback('✨ Key Google Gemini terdeteksi! Provider otomatis disetel ke Google Gemini.', 'success');
       }
     });
   }
@@ -584,8 +663,10 @@ async function handleFetchModels() {
     // Clear select options
     selectModel.innerHTML = '';
 
-    // Always put 'auto' first for smart routing
-    if (!models.includes('auto')) {
+    const isGoogle = baseUrl.toLowerCase().includes('googleapis.com');
+
+    // Only put 'auto' first if not Google Gemini (for FreeLLMAPI)
+    if (!isGoogle && !models.includes('auto')) {
       const autoOpt = document.createElement('option');
       autoOpt.value = 'auto';
       autoOpt.textContent = 'auto (Smart Routing)';
@@ -596,7 +677,7 @@ async function handleFetchModels() {
     for (const m of models) {
       const opt = document.createElement('option');
       opt.value = m;
-      opt.textContent = m === 'auto' ? 'auto (Smart Routing)' : m;
+      opt.textContent = m === 'auto' ? 'auto (Smart Routing)' : (m === 'gemini-3.8-flash' ? `${m} (Rekomendasi)` : m);
       selectModel.appendChild(opt);
     }
 
@@ -606,11 +687,11 @@ async function handleFetchModels() {
     customOpt.textContent = '✍️ Ketik Model Manual...';
     selectModel.appendChild(customOpt);
 
-    // Default to 'auto' or previous model if found
+    // Default to mentor.model or first option
     if (models.includes(mentor.model)) {
       selectModel.value = mentor.model;
     } else {
-      selectModel.value = 'auto';
+      selectModel.value = models[0] || (isGoogle ? 'gemini-3.8-flash' : 'auto');
     }
 
     showSettingsFeedback(`Berhasil mengambil ${models.length} model!`, 'success');
@@ -626,12 +707,33 @@ async function handleFetchModels() {
  * Save Settings
  */
 async function handleSaveSettings() {
-  const newBaseUrl = inputBaseUrl.value.trim() || 'http://127.0.0.1:31415';
+  let newBaseUrl = inputBaseUrl.value.trim();
   const newKey = inputApiKey.value.trim();
   let newModel = selectModel.value;
 
+  if (selectProviderPreset && selectProviderPreset.value === 'gemini') {
+    if (!newBaseUrl || newBaseUrl.includes('127.0.0.1') || newBaseUrl.includes('localhost')) {
+      newBaseUrl = DEFAULT_GEMINI_URL;
+      inputBaseUrl.value = DEFAULT_GEMINI_URL;
+    }
+  } else if (!newBaseUrl) {
+    newBaseUrl = DEFAULT_GEMINI_URL;
+  }
+
   if (newModel === 'custom') {
-    newModel = inputCustomModel.value.trim() || 'auto';
+    const customName = inputCustomModel.value.trim();
+    if (!customName) {
+      showSettingsFeedback('Harap ketik nama model khusus di kolom Nama Model Khusus.', 'error');
+      inputCustomModel.focus();
+      return;
+    }
+    newModel = customName;
+  }
+
+  // Warning if attempting to use localhost
+  if ((newBaseUrl.includes('127.0.0.1') || newBaseUrl.includes('localhost')) && selectProviderPreset?.value !== 'freellmapi') {
+    selectProviderPreset.value = 'freellmapi';
+    updatePresetUI('freellmapi');
   }
 
   await mentor.setConfig(newBaseUrl, newKey, newModel);
